@@ -1,6 +1,20 @@
 {
-    "name": "Crowdcheck",
+    "name": "CrowdCheck",
     "description": "Final project",
     "version": "1.0",
-    "manifest_version": 3
-  }
+    "manifest_version": 3,
+    "action": {
+      "default_popup": "popup.html",
+      "default_title": "Visit a Google search result page to witness magic",
+      "default_icon": "search.png"
+    },
+    "permissions": [
+      "storage"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["popup.js"]
+      }
+    ]
+}
