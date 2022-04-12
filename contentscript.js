@@ -14,6 +14,7 @@ function getTitlesAndLinks() {
 
 function getPageRanking(links, email) {
     links.forEach((link) => {
+        console.log("Email: ", email, "Link: ", link)
         url = "https://gkm6y9vexh.execute-api.us-east-1.amazonaws.com/dev/pages?userID="+email+"&url="+link
         fetch(url, {
             method: 'GET',
@@ -32,9 +33,12 @@ function pushPageRanking(links, headings, email) {
         data = {
             "userID": email,
             "url": link,
-            "text": headings[i],
             "vote": 1 // TODO: SATVIR Retrieve vote from report button
         }
+        if (headings.length > 0) {
+            data["text"] = headings[i]
+        }
+
         url = "https://gkm6y9vexh.execute-api.us-east-1.amazonaws.com/dev/pages"
         console.log(data)
         fetch(url, {
@@ -53,10 +57,14 @@ function pushPageRanking(links, headings, email) {
 currentURL = window.location.href
 console.log("CurrentURL", currentURL)
 
-if (currentURL.indexOf("search?q=") > 0) {
-    const [headings, links] = getTitlesAndLinks()
-    chrome.storage.sync.get(['email']).then((val)=> {
-        // getPageRanking(links, val.email)
-        // pushPageRanking(links, headings, val.email)
-    })
-}
+chrome.storage.sync.get(['email']).then((val)=> {
+    links = []
+    headings = []
+    if (currentURL.indexOf("search?q=") > 0) {
+        [headings, links] = getTitlesAndLinks()
+    } else {
+        links.push(currentURL)
+    }
+    // getPageRanking(links, val.email)
+    // pushPageRanking(links, headings, val.email)
+})
