@@ -1,0 +1,42 @@
+service: crowd-check
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-python-requirements
+  - serverless-wsgi
+  
+custom:
+  wsgi:
+    app: app.app
+    packRequirements: false
+  pythonRequirements:
+    # dockerizePip: non-linux
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "Fn::GetAtt": [ PagesVote, Arn ]
+  
+functions:
+  app:
+    handler: wsgi.handler
+    events:
+      - http: ANY /
+      - http: 'ANY /{proxy+}'
+
+resources:
+  # DynamoDB
+  - ${file(resources/dynamodb-table.yml)}
